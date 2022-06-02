@@ -1,10 +1,40 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
 public class Solution {
 
-    public static class Rational {
+    static int findOverallGCD(Integer[] resultList) {
+        int result = resultList[0];
 
-        private int num, denom;
+        for(int i=1; i < resultList.length; i++){
 
-        public Rational(double d) {
+            result = findLCM(resultList[i], result);
+
+        }
+
+        return result;
+
+    }
+
+    static int findGCD(int a, int b) {
+        if (a == 0)
+            return b;
+
+        return findGCD(b % a, a);
+    }
+
+    // function to calculate lcm of
+    // two numbers.
+    static int findLCM(int a, int b) {
+        return (a * b) / findGCD(a, b);
+    }
+
+    static class Rational {
+
+        int num, denom;
+
+        Rational(double d) {
             String s = String.valueOf(d);
             int digitsDec = s.length() - 1 - s.indexOf('.');
             int denom = 1;
@@ -14,23 +44,13 @@ public class Solution {
             }
 
             int num = (int) Math.round(d);
-            this.num = num;
-            this.denom = denom;
+            int g = findGCD(num, denom);
+            this.num = num / g;
+            this.denom = denom / g;
         }
 
-        public Rational(int num, int denom) {
-            this.num = num;
-            this.denom = denom;
-        }
-
-        public String toString() {
-            return String.valueOf(num) + "/" + String.valueOf(denom);
-        }
-
-        public static void main(String[] args) {
-            System.out.println(new Rational(1.5));
-        }
     }
+
 
     static double[][] multiplyMatrix(double[][] A, double[][] B) {
 
@@ -161,7 +181,162 @@ public class Solution {
         return x;
     }
     public static int[] solution(int[][] m) {
-        // Your code here
-        return null;
+        HashMap<Integer, Integer> rowTotals = new HashMap<>();
+        int currKey = 0;
+
+        for (int[] row : m) {
+            currKey += 1;
+            int sum = 0;
+            for (int val : row) {
+                sum += val;
+            }
+
+            rowTotals.put(currKey, sum);
+
+        }
+
+        HashMap<Integer, int[]> iMatrix = new HashMap<>();
+        HashMap<Integer, int[]> oMatrix = new HashMap<>();
+        HashMap<Integer, ArrayList<Integer>> rMatrix = new HashMap<>();
+        HashMap<Integer, ArrayList<Integer>> qMatrix = new HashMap<>();
+        HashMap<Integer, int[]> iQMatrix = new HashMap<>();
+
+        int numAbsStates = 0;
+
+        for (int key : rowTotals.keySet()) {
+
+            if (rowTotals.get(key) == 0) {
+
+                numAbsStates++;
+
+            }
+
+        }
+
+        //prep iMatrix
+        for (int row : rowTotals.keySet()) {
+            iMatrix.put(row, new int[numAbsStates]);
+        }
+
+        int valCount = 0;
+        for (int key : iMatrix.keySet()) {
+            iMatrix.get(key)[valCount] = 1;
+            valCount++;
+        }
+
+        //prep rMatrix
+        for (int i = 0; i < m.length; i++) {
+
+            if (!iMatrix.containsKey(i)) {
+                ArrayList<Integer> newValR = new ArrayList<>();
+                for (int key : iMatrix.keySet()) {
+
+                    newValR.add(m[i][key]/rowTotals.get(i));
+
+                }
+
+                rMatrix.put(i, newValR);
+            }
+
+        }
+
+        //prepare Q Matrix
+
+        for (int i = 0; i < m.length; i++) {
+
+            if (!iMatrix.containsKey(i)) {
+                ArrayList<Integer> newValQ = new ArrayList<>();
+                for (int key : rMatrix.keySet()) {
+
+                    newValQ.add(m[i][key]/rowTotals.get(i));
+
+                }
+
+                qMatrix.put(i, newValQ);
+            }
+
+        }
+
+        //prepare iQ Matrix
+        for (int row : qMatrix.keySet()) {
+            iQMatrix.put(row, new int[qMatrix.size()]);
+        }
+
+        int valCountIQ = 0;
+        for (int key : iQMatrix.keySet()) {
+            iQMatrix.get(key)[valCountIQ] = 1;
+            valCountIQ++;
+        }
+
+        //prepare F Matrix
+
+        HashMap<Integer, ArrayList<Integer>> fNIMatrix = new HashMap<>();
+
+        for (Integer iQVal : iQMatrix.keySet()) {
+
+            int[] iQValsList = iQMatrix.get(iQVal);
+            ArrayList<Integer> qValsList = new ArrayList<>(qMatrix.get(iQVal));
+            ArrayList<Integer> subResult = new ArrayList<>();
+
+            for (int val : iQValsList) {
+
+                subResult.add((Integer) iQValsList[val] - qValsList.get(val));
+
+            }
+
+            fNIMatrix.put(iQVal, subResult);
+
+        }
+            //Convert fNIMatrix & rMatrix to double[][] to invert & multiply
+
+            double[][] fMatrix = new double[fNIMatrix.size()][fNIMatrix.size()];
+            double[][] rMatrixPost = new double[rMatrix.size()][rMatrix.size()];
+
+            for (int i = 0; i < fNIMatrix.size(); i++) {
+
+                fMatrix[i] = fNIMatrix.get(i).stream().mapToDouble(j -> j).toArray();;
+
+            }
+
+            for (int k = 0; k < rMatrix.size(); k++) {
+
+                rMatrixPost[k] = fNIMatrix.get(k).stream().mapToDouble(n -> n).toArray();;
+
+            }
+
+            fMatrix = invert(fMatrix);
+
+            double[][] FRMatrix = multiplyMatrix(fMatrix, rMatrixPost);
+
+            double[] result = FRMatrix[0];
+
+            ArrayList<Integer> resultNums = new ArrayList<>();
+            ArrayList<Integer> resultDenoms = new ArrayList<>();
+
+            for (double value : result) {
+
+                Rational fractionValue = new Rational(value);
+
+                resultNums.add(fractionValue.num);
+                resultDenoms.add(fractionValue.denom);
+
+            }
+
+            int lcd = findOverallGCD(resultDenoms.toArray(new Integer[0]));
+
+
+            for (int i = 0; i < resultNums.size(); i++) {
+
+                int newNum = resultNums.get(i);
+
+                newNum *= (lcd / resultDenoms.get(i));
+
+                resultNums.set(i, newNum);
+            }
+
+            resultNums.add(lcd);
+
+
+        return resultNums.stream().mapToInt(i -> i).toArray();
     }
 }
