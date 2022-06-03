@@ -1,3 +1,5 @@
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,19 +36,28 @@ public class Solution {
 
         int num, denom;
 
-        Rational(double d) {
-            String s = String.valueOf(d);
-            int digitsDec = s.length() - 1 - s.indexOf('.');
-            int denom = 1;
-            for (int i = 0; i < digitsDec; i++) {
-                d *= 10;
-                denom *= 10;
-            }
+        Rational(double value) {
 
-            int num = (int) Math.round(d);
-            int g = findGCD(num, denom);
-            this.num = num / g;
-            this.denom = denom / g;
+            this.num = toFractionPos(new BigDecimal(value))[0];
+            this.denom = toFractionPos(new BigDecimal(value))[1];
+
+        }
+
+        static int[] toFractionPos(BigDecimal x) {
+            String[] parts = x.toString().split("\\.");
+            BigDecimal den = BigDecimal.TEN.pow(parts[1].length()); // denominator
+            BigDecimal num = (new BigDecimal(parts[0]).multiply(den)).add(new BigDecimal(parts[1])); // numerator
+
+           return reduceFraction(num.intValue(), den.intValue());
+
+        }
+
+        static int[] reduceFraction(int num, int den) {
+            int gcd = BigInteger.valueOf(num).gcd(BigInteger.valueOf(den)).intValue(); // greatest
+            // common
+            // divisor
+            int[] rf = { num / gcd, den / gcd };
+            return rf;
         }
 
     }
