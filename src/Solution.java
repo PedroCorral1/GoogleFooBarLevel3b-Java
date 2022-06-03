@@ -38,8 +38,8 @@ public class Solution {
 
         Rational(double value) {
 
-            this.num = toFractionPos(new BigDecimal(value))[0];
-            this.denom = toFractionPos(new BigDecimal(value))[1];
+            this.num = toFractionPos(new BigDecimal(String.valueOf(value)))[0];
+            this.denom = toFractionPos(new BigDecimal(String.valueOf(value)))[1];
 
         }
 
