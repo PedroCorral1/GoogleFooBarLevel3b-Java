@@ -185,22 +185,34 @@ public class Solution {
         int currKey = 0;
 
         for (int[] row : m) {
-            currKey += 1;
             int sum = 0;
             for (int val : row) {
                 sum += val;
             }
 
             rowTotals.put(currKey, sum);
+            currKey += 1;
+        }
+
+        HashMap<Integer, Integer[]> masterMatrix = new HashMap<>();
+
+        for (int i = 0; i < m.length; i++) {
+
+            masterMatrix.put(i, Arrays.stream(m[i]).boxed().toArray(Integer[]::new));
 
         }
 
         HashMap<Integer, int[]> iMatrix = new HashMap<>();
         HashMap<Integer, int[]> oMatrix = new HashMap<>();
-        HashMap<Integer, ArrayList<Integer>> rMatrix = new HashMap<>();
-        HashMap<Integer, ArrayList<Integer>> qMatrix = new HashMap<>();
+        HashMap<Integer, Double[]> rMatrix = new HashMap<>();
+        HashMap<Integer, Double[]> qMatrix = new HashMap<>();
         HashMap<Integer, int[]> iQMatrix = new HashMap<>();
 
+        /*
+
+        */
+
+        //prep iMatrix
         int numAbsStates = 0;
 
         for (int key : rowTotals.keySet()) {
@@ -213,9 +225,10 @@ public class Solution {
 
         }
 
-        //prep iMatrix
         for (int row : rowTotals.keySet()) {
-            iMatrix.put(row, new int[numAbsStates]);
+            if (rowTotals.get(row) == 0) {
+                iMatrix.put(row, new int[numAbsStates]);
+            }
         }
 
         int valCount = 0;
@@ -225,34 +238,58 @@ public class Solution {
         }
 
         //prep rMatrix
-        for (int i = 0; i < m.length; i++) {
+        ArrayList<Integer> rKeys = new ArrayList<>();
+        ArrayList<Integer> qKeys = new ArrayList<>();
 
-            if (!iMatrix.containsKey(i)) {
-                ArrayList<Integer> newValR = new ArrayList<>();
-                for (int key : iMatrix.keySet()) {
+        for (Integer key : masterMatrix.keySet()) {
 
-                    newValR.add(m[i][key]/rowTotals.get(i));
+            if (iMatrix.containsKey(key)) {
 
-                }
+                rKeys.add(key);
 
-                rMatrix.put(i, newValR);
+            } else {
+
+                qKeys.add(key);
+
             }
 
         }
 
-        //prepare Q Matrix
+        for (Integer key : masterMatrix.keySet()) {
 
-        for (int i = 0; i < m.length; i++) {
+            Double[] keyValues = new Double[iMatrix.size()];
 
-            if (!iMatrix.containsKey(i)) {
-                ArrayList<Integer> newValQ = new ArrayList<>();
-                for (int key : rMatrix.keySet()) {
+            if (!iMatrix.containsKey(key)) {
 
-                    newValQ.add(m[i][key]/rowTotals.get(i));
+                for (int i = 0; i < rKeys.size(); i++) {
+
+                    keyValues[i] = masterMatrix.get(key)[rKeys.get(i)].doubleValue() / rowTotals.get(key);
 
                 }
 
-                qMatrix.put(i, newValQ);
+                rMatrix.put(key, keyValues);
+
+            }
+
+        }
+
+
+        //prepare Q Matrix
+
+        for (Integer key : masterMatrix.keySet()) {
+
+            Double[] keyValues = new Double[masterMatrix.size() - iMatrix.size()];
+
+            if (!iMatrix.containsKey(key)) {
+
+                for (int i = 0; i < qKeys.size(); i++) {
+
+                    keyValues[i] = masterMatrix.get(key)[qKeys.get(i)].doubleValue() / rowTotals.get(key);
+
+                }
+
+                qMatrix.put(key, keyValues);
+
             }
 
         }
@@ -270,17 +307,17 @@ public class Solution {
 
         //prepare F Matrix
 
-        HashMap<Integer, ArrayList<Integer>> fNIMatrix = new HashMap<>();
+        HashMap<Integer, Double[]> fNIMatrix = new HashMap<>();
 
         for (Integer iQVal : iQMatrix.keySet()) {
 
             int[] iQValsList = iQMatrix.get(iQVal);
-            ArrayList<Integer> qValsList = new ArrayList<>(qMatrix.get(iQVal));
-            ArrayList<Integer> subResult = new ArrayList<>();
+            Double[] qValsList = qMatrix.get(iQVal);
+            Double[] subResult = new Double[qValsList.length];
 
-            for (int val : iQValsList) {
+            for (int i = 0; i < iQValsList.length; i++) {
 
-                subResult.add((Integer) iQValsList[val] - qValsList.get(val));
+                subResult[i] = iQValsList[i] - qValsList[i];
 
             }
 
@@ -294,13 +331,13 @@ public class Solution {
 
             for (int i = 0; i < fNIMatrix.size(); i++) {
 
-                fMatrix[i] = fNIMatrix.get(i).stream().mapToDouble(j -> j).toArray();;
+                fMatrix[i] = Arrays.stream(fNIMatrix.get(i)).mapToDouble(j -> j).toArray();
 
             }
 
             for (int k = 0; k < rMatrix.size(); k++) {
 
-                rMatrixPost[k] = fNIMatrix.get(k).stream().mapToDouble(n -> n).toArray();;
+                rMatrixPost[k] = Arrays.stream(rMatrix.get(k)).mapToDouble(j -> j).toArray();
 
             }
 
@@ -339,4 +376,13 @@ public class Solution {
 
         return resultNums.stream().mapToInt(i -> i).toArray();
     }
+
+    public static void main(String[] args) {
+
+        int[][] testArray = {{0,1,0,0,0,1}, {4,0,0,3,2,0}, {0,0,0,0,0,0}, {0,0,0,0,0,0}, {0,0,0,0,0,0}, {0,0,0,0,0,0}};
+
+        System.out.println(Arrays.toString(solution(testArray)));
+
+    }
+
 }
