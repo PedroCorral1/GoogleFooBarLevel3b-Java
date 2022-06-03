@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1dd0ba36-d467-4c4f-a0a8-145369130d8f" name="Changes" comment="Everything works except for the conversion to fraction (new func try)">
+    <list default="true" id="1dd0ba36-d467-4c4f-a0a8-145369130d8f" name="Changes" comment="Everything works except for the conversion to fraction (new func try - ratoinal)">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Solution.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Solution.java" afterDir="false" />
     </list>
@@ -68,7 +68,7 @@
       <option name="presentableId" value="Default" />
       <updated>1653682657436</updated>
       <workItem from="1653682658613" duration="951000" />
-      <workItem from="1654192407640" duration="22770000" />
+      <workItem from="1654192407640" duration="26619000" />
     </task>
     <task id="LOCAL-00001" summary="Java Starter Code">
       <created>1653682711287</created>
@@ -105,7 +105,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654220343300</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Everything works except for the conversion to fraction (new func try - ratoinal)">
+      <created>1654221579630</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1654221579630</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -127,15 +134,21 @@
     <MESSAGE value="First finished draft" />
     <MESSAGE value="Everything works except for the conversion to fraction." />
     <MESSAGE value="Everything works except for the conversion to fraction (new func try)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Everything works except for the conversion to fraction (new func try)" />
+    <MESSAGE value="Everything works except for the conversion to fraction (new func try - ratoinal)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Everything works except for the conversion to fraction (new func try - ratoinal)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Solution.java</url>
-          <line>363</line>
+          <line>399</line>
           <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/Solution.java</url>
+          <line>32</line>
+          <option name="timeStamp" value="10" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

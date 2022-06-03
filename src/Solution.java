@@ -1,5 +1,3 @@
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,31 +32,69 @@ public class Solution {
 
     static class Rational {
 
-        int num, denom;
+        private int num, denom;
 
+        public static int[] doubleToFraction(double x) {
+
+            double error = 0.000001;
+
+            int n = (int) Math.floor(x);
+            x -= n;
+
+            if (x < error) {
+
+                return new int[]{n, 1};
+
+            } else if ((1- error) < x) {
+
+                return new int[]{n+1, 1};
+
+            }
+
+            // The lower fraction is 0/1
+            int lowerN = 0;
+            int lowerD = 1;
+            //The upper fraction is 1/1
+            int upperN = 1;
+            int upperD = 1;
+
+            while (true) {
+
+                //The middle fraction is (lowerN + upperN) / (lowerD + upperD)
+                int middleN = lowerN + upperN;
+                int middleD = lowerD + upperD;
+
+                //If x + error < middle
+                if (middleD * (x + error) < middleN) {
+                    //middle is our new upper
+                    upperN = middleN;
+                    upperD = middleD;
+
+                } else if (middleN < (x - error) * middleD) {
+
+                    //middle is our new lower
+                    lowerN = middleN;
+                    lowerD = middleD;
+
+                    //Else middle is our best fraction
+                } else {
+
+                    return new int[]{n * middleD + middleN, middleD};
+
+                }
+
+            }
+        }
+        
         Rational(double value) {
-
-            this.num = toFractionPos(new BigDecimal(String.valueOf(value)))[0];
-            this.denom = toFractionPos(new BigDecimal(String.valueOf(value)))[1];
-
+            
+            int[] results = doubleToFraction(value);
+            
+            this.num = results[0];
+            this.denom = results[1];
+            
         }
 
-        static int[] toFractionPos(BigDecimal x) {
-            String[] parts = x.toString().split("\\.");
-            BigDecimal den = BigDecimal.TEN.pow(parts[1].length()); // denominator
-            BigDecimal num = (new BigDecimal(parts[0]).multiply(den)).add(new BigDecimal(parts[1])); // numerator
-
-           return reduceFraction(num.intValue(), den.intValue());
-
-        }
-
-        static int[] reduceFraction(int num, int den) {
-            int gcd = BigInteger.valueOf(num).gcd(BigInteger.valueOf(den)).intValue(); // greatest
-            // common
-            // divisor
-            int[] rf = { num / gcd, den / gcd };
-            return rf;
-        }
 
     }
 
